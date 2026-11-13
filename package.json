@@ -1,0 +1,28 @@
+{
+  "name": "deployagram-nodejs-dont-forget-vitest-msw-demo",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Reads suggestions from a Kafka topic and calls the Emailer over HTTP. Service tests use Vitest, testcontainers and MSW.",
+  "license": "Unlicense",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "node --env-file-if-exists=.env ./node_modules/vitest/vitest.mjs run"
+  },
+  "dependencies": {
+    "@kafkajs/confluent-schema-registry": "^4.1.0",
+    "kafkajs": "^2.2.4"
+  },
+  "devDependencies": {
+    "@testcontainers/kafka": "^12.2.1",
+    "@types/node": "^22.20.5",
+    "msw": "^3.0.4",
+    "testcontainers": "^12.2.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "SuggestedBookMessage",
+  "namespace": "com.deployagram.demo.dontforget.avro",
+  "fields": [
+    { "name": "email", "type": "string" },
+    {
+      "name": "suggestion",
+      "type": {
+        "type": "record",
+        "name": "BookSuggestion",
+        "fields": [
+          { "name": "name", "type": "string" },
+          { "name": "edition", "type": "string" },
+          { "name": "format", "type": "string" },
+          {
+            "name": "authors",
+            "type": {
+              "type": "array",
+              "items": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
