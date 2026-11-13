@@ -18,6 +18,11 @@
     "kafkajs": "^2.2.4"
   },
   "devDependencies": {
+    "@deployagram/api": "^1.0.0",
+    "@deployagram/environment": "^1.0.0",
+    "@deployagram/kafkajs": "^1.0.0",
+    "@deployagram/logger-client": "^1.0.0",
+    "@deployagram/msw": "^1.0.0",
     "@testcontainers/kafka": "^12.2.1",
     "@types/node": "^22.20.5",
     "msw": "^3.0.4",

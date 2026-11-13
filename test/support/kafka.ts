@@ -1,5 +1,4 @@
 import { KafkaContainer, type StartedKafkaContainer } from '@testcontainers/kafka';
-import type { StartedNetwork } from 'testcontainers';
 import { Kafka } from 'kafkajs';
 
 /**
@@ -11,19 +10,27 @@ export const KAFKA_IMAGE = 'confluentinc/cp-kafka:7.6.1';
 // "__COLON__" stands in for ":", which is not legal in a Kafka topic name.
 export const SUGGESTIONS_TOPIC = 'ORG_ctm_01m1j08sx96792d2tysabvyadp__COLON__SuppliedSuggestionsTopic';
 
+/** The Docker network the Deployagram Collector runs on. Kafka must be on it for the Collector to read from it. */
+export const DEPLOYAGRAM_NETWORK = 'deployagram';
+
 // The port testcontainers' Kafka image listens on inside the container.
 const KAFKA_INTERNAL_PORT = 9093;
 // The broker's listener for other containers. The module advertises it under the network alias.
 const KAFKA_NETWORK_PORT = 9092;
 
 /**
- * Starts a broker on the network, reachable there as `alias`. Other containers on the network can reach it by that name.
+ * Starts a broker on the Deployagram network, reachable there as `alias`. Each container on the
+ * network can then reach it by that name.
  */
-export async function startKafka(network: StartedNetwork, alias: string): Promise<StartedKafkaContainer> {
-  return new KafkaContainer(KAFKA_IMAGE).withKraft().withNetwork(network).withNetworkAliases(alias).start();
+export async function startKafka(alias: string): Promise<StartedKafkaContainer> {
+  return new KafkaContainer(KAFKA_IMAGE)
+    .withKraft()
+    .withNetworkMode(DEPLOYAGRAM_NETWORK)
+    .withNetworkAliases(alias)
+    .start();
 }
 
-/** The broker's address on the network, as other containers on it use it. */
+/** The broker's address on the Deployagram network, as the Collector and other containers use it. */
 export function networkBootstrapServersOf(alias: string): string {
   return `PLAINTEXT://${alias}:${KAFKA_NETWORK_PORT}`;
 }

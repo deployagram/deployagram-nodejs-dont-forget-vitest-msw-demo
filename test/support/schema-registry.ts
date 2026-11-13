@@ -1,8 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { SchemaRegistry, SchemaType } from '@kafkajs/confluent-schema-registry';
 import { GenericContainer, Wait, type StartedTestContainer } from 'testcontainers';
-import type { StartedNetwork } from 'testcontainers';
-import { networkBootstrapServersOf, SUGGESTIONS_TOPIC } from './kafka.js';
+import { DEPLOYAGRAM_NETWORK, networkBootstrapServersOf, SUGGESTIONS_TOPIC } from './kafka.js';
 
 /** The Confluent Schema Registry image, matching the Kafka image's version. */
 export const SCHEMA_REGISTRY_IMAGE = 'confluentinc/cp-schema-registry:7.6.1';
@@ -16,12 +15,12 @@ const SCHEMA_FILE = new URL('../resources/avro/dont_forget_message.avsc', import
 export const VALUE_SUBJECT = `${SUGGESTIONS_TOPIC}-value`;
 
 /**
- * Starts a Schema Registry on the network, reachable there as `alias`, and talking to the broker that is reachable
- * there as `kafkaAlias`.
+ * Starts a Schema Registry on the Deployagram network, reachable there as `alias`, and talking to
+ * the broker that is reachable there as `kafkaAlias`.
  */
-export async function startSchemaRegistry(network: StartedNetwork, alias: string, kafkaAlias: string): Promise<StartedTestContainer> {
+export async function startSchemaRegistry(alias: string, kafkaAlias: string): Promise<StartedTestContainer> {
   return new GenericContainer(SCHEMA_REGISTRY_IMAGE)
-    .withNetwork(network)
+    .withNetworkMode(DEPLOYAGRAM_NETWORK)
     .withNetworkAliases(alias)
     .withExposedPorts(SCHEMA_REGISTRY_PORT)
     .withEnvironment({
@@ -33,6 +32,11 @@ export async function startSchemaRegistry(network: StartedNetwork, alias: string
     .withWaitStrategy(Wait.forHttp('/subjects', SCHEMA_REGISTRY_PORT).forStatusCode(200))
     .withStartupTimeout(60_000)
     .start();
+}
+
+/** The Schema Registry's URL on the Deployagram network, as the Collector uses it. */
+export function networkSchemaRegistryUrlOf(alias: string): string {
+  return `http://${alias}:${SCHEMA_REGISTRY_PORT}`;
 }
 
 /** The Schema Registry's URL as seen from the test process. */
